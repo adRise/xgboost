@@ -26,9 +26,12 @@ import org.apache.spark.sql.{DataFrame, Row}
 import org.scalatest.funsuite.AnyFunSuite
 
 import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.commons.logging.LogFactory
+
 
 class XGBoostRegressorSuite extends AnyFunSuite with PerTest with TmpFolderPerSuite {
   protected val treeMethod: String = "auto"
+  val logger = LogFactory.getLog("XGBoostSpark")
 
   test("XGBoost-Spark XGBoostRegressor output should match XGBoost4j") {
     val trainingDM = new DMatrix(Regression.train.iterator)
@@ -133,6 +136,7 @@ class XGBoostRegressorSuite extends AnyFunSuite with PerTest with TmpFolderPerSu
   }
 
   test("ranking: test position bias") {
+    logger.info("hongfeili-scala: begin execute test")
     val paramMap = Map("eta" -> "1", "max_depth" -> "6", "silent" -> "0", "verbosity" -> "3",
       "objective" -> "rank:ndcg", "num_workers" -> numWorkers, "num_round" -> 5,
       "group_col" -> "group", "tree_method" -> treeMethod, "lambdarank_unbiased" -> true, "eval_metric" -> "ndcg")
@@ -142,7 +146,6 @@ class XGBoostRegressorSuite extends AnyFunSuite with PerTest with TmpFolderPerSu
     val model = new XGBoostRegressor(paramMap).fit(trainingDF)
 
     val prediction = model.transform(testDF).collect()
-    println("hello---------hongfei")
     assert(testDF.count() === prediction.length)
   }
 

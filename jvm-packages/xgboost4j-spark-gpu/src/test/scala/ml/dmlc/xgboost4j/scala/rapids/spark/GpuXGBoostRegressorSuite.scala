@@ -23,8 +23,10 @@ import ml.dmlc.xgboost4j.scala.spark.{XGBoostRegressionModel, XGBoostRegressor}
 import org.apache.spark.ml.feature.VectorAssembler
 import org.apache.spark.sql.functions.{col, udf}
 import org.apache.spark.sql.types.{FloatType, IntegerType, StructField, StructType}
+import org.apache.commons.logging.LogFactory
 
 class GpuXGBoostRegressorSuite extends GpuTestSuite {
+  val logger = LogFactory.getLog("XGBoostSpark")
 
   val labelName = "label_col"
   val groupName = "group_col"
@@ -244,6 +246,24 @@ class GpuXGBoostRegressorSuite extends GpuTestSuite {
       val xgbParam = Map("eta" -> 0.1f, "max_depth" -> 2, "objective" -> "rank:ndcg",
         "num_round" -> 10, "num_workers" -> 1, "tree_method" -> "gpu_hist",
         "features_cols" -> featureNames, "label_col" -> labelName)
+      val Array(trainingDf, testDf) = spark.read.option("header", "true").schema(schema)
+        .csv(getResourcePath("/rank.train.csv")).randomSplit(Array(0.7, 0.3), seed = 1)
+
+      val model = new XGBoostRegressor(xgbParam)
+        .setGroupCol(groupName)
+        .fit(trainingDf)
+
+      val ret = model.transform(testDf).collect()
+      assert(testDf.count() === ret.length)
+    }
+  }
+
+  test("Ranking: test position bias") {
+    withGpuSparkSession(enableCsvConf()) { spark =>
+      logger.info("hongfeili-scala: begin execute test")
+      val xgbParam = Map("eta" -> 0.1f, "max_depth" -> 2, "objective" -> "rank:ndcg",
+        "num_round" -> 10, "num_workers" -> 1, "tree_method" -> "gpu_hist",
+        "features_cols" -> featureNames, "label_col" -> labelName, "lambdarank_unbiased" -> true, "eval_metric" -> "ndcg")
       val Array(trainingDf, testDf) = spark.read.option("header", "true").schema(schema)
         .csv(getResourcePath("/rank.train.csv")).randomSplit(Array(0.7, 0.3), seed = 1)
 
