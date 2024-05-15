@@ -36,6 +36,7 @@
 #include "xgboost/span.h"                  // for Span, operator!=
 #include "xgboost/string_view.h"           // for operator<<, StringView
 #include "xgboost/task.h"                  // for ObjInfo
+#include "../collective/communicator-inl.h"  // for Allreduce, Broadcast, Finalize, GetProcessor...
 
 namespace xgboost::obj {
 namespace cpu_impl {
@@ -313,6 +314,8 @@ class LambdaRankObj : public FitIntercept {
     if (!info.weights_.Empty()) {
       CHECK_EQ(info.weights_.Size(), n_groups) << error::GroupWeight();
     }
+
+    collective::Print("hongfeili-cpp lambdarank_unbiased: " + std::to_string(param_.lambdarank_unbiased));
 
     if (ti_plus_.Size() == 0 && param_.lambdarank_unbiased) {
       CHECK_EQ(iter, 0);

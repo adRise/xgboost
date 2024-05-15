@@ -59,7 +59,7 @@ trait PerTest extends BeforeAndAfterEach { self: AnyFunSuite =>
   private def getOrCreateSession = synchronized {
     if (currentSession == null) {
       currentSession = sparkSessionBuilder.getOrCreate()
-      currentSession.sparkContext.setLogLevel("ERROR")
+      currentSession.sparkContext.setLogLevel("INFO")
     }
     currentSession
   }

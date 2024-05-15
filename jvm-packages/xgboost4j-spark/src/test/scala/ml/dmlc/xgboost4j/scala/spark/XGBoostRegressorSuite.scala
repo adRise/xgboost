@@ -132,6 +132,20 @@ class XGBoostRegressorSuite extends AnyFunSuite with PerTest with TmpFolderPerSu
     assert(testDF.count() === prediction.length)
   }
 
+  test("ranking: test position bias") {
+    val paramMap = Map("eta" -> "1", "max_depth" -> "6", "silent" -> "0", "verbosity" -> "3",
+      "objective" -> "rank:ndcg", "num_workers" -> numWorkers, "num_round" -> 5,
+      "group_col" -> "group", "tree_method" -> treeMethod, "lambdarank_unbiased" -> true, "eval_metric" -> "ndcg")
+
+    val trainingDF = buildDataFrameWithGroup(Ranking.train)
+    val testDF = buildDataFrame(Ranking.test)
+    val model = new XGBoostRegressor(paramMap).fit(trainingDF)
+
+    val prediction = model.transform(testDF).collect()
+    println("hello---------hongfei")
+    assert(testDF.count() === prediction.length)
+  }
+
   test("use weight") {
     val paramMap = Map("eta" -> "1", "max_depth" -> "6", "silent" -> "1",
       "objective" -> "reg:squarederror", "num_round" -> 5, "num_workers" -> numWorkers,
