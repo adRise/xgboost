@@ -25,6 +25,12 @@ jobs:
       RSPM: ${{ matrix.config.rspm }}
 
     steps:
+    - name: Harden the runner
+      uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
+      with:
+        use-policy-store: true
+        api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
     - uses: actions/checkout@e2f20e631ae6d7dd3b768f56a5d2af784dd54791 # v2.5.0
       with:
         submodules: 'true'
@@ -64,6 +70,12 @@ jobs:
       RSPM: ${{ matrix.config.rspm }}
 
     steps:
+    - name: Harden the runner
+      uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
+      with:
+        use-policy-store: true
+        api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
     - name: Install system dependencies
       run: |
         sudo apt update
@@ -113,6 +125,12 @@ jobs:
       image: rhub/debian-gcc-release
 
     steps:
+    - name: Harden the runner
+      uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
+      with:
+        use-policy-store: true
+        api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
     - name: Install system dependencies
       run: |
         # Must run before checkout to have the latest git installed.
