@@ -25,6 +25,12 @@ jobs:
         - os: macos-14
           platform_id: macosx_arm64
     steps:
+    - name: Harden the runner
+      uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
+      with:
+        use-policy-store: true
+        api-key: ${{ secrets.STEP_SECURITY_API_KEY }}
+
     - uses: actions/checkout@a12a3943b4bdde767164f792f33f40b04645d846 # v3.0.0
       with:
         submodules: 'true'
